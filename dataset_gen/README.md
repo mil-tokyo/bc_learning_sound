@@ -3,6 +3,7 @@ Dataset setup
 
 Dataset preparation for ESC-50, ESC-10 [[1]](#1), and UrbanSound8K [[2]](#2).
 
+- FFmpeg should be installed.
 - First of all, please make a directory to save datasets.
 
 		mkdir [path]
