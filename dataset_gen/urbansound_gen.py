@@ -1,8 +1,8 @@
 """
  Dataset preparation code for UrbanSound8k [Salamon, 2014].
- Usage: python urbansound_gen.py [root]
- Original dataset should be downloaded in [root]/urbansound8k/.
- ffmpeg is required.
+ Usage: python urbansound_gen.py [path]
+ Original dataset should be downloaded in [path]/urbansound8k/.
+ FFmpeg should be installed.
 
 """
 

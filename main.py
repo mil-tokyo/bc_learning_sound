@@ -1,3 +1,9 @@
+"""
+ Learning from Between-class Examples for Deep Sound Recognition.
+ Yuji Tokozume, Yoshitaka Ushiku, and Tatsuya Harada
+
+"""
+
 import sys
 import os
 import chainer

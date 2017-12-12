@@ -83,15 +83,21 @@ def parse():
 
 
 def display_info(opt):
+    if opt.BC:
+        learning = 'BC'
+    else:
+        learning = 'standard'
+
     print('+------------------------------+')
     print('| Sound classification')
     print('+------------------------------+')
-    print('| dataset : {}'.format(opt.dataset))
-    print('| netType : {}'.format(opt.netType))
-    print('| BC      : {}'.format(opt.BC))
-    print('| augment : {}'.format(opt.strongAugment))
-    print('| nEpochs : {}'.format(opt.nEpochs))
-    print('| LRInit  : {}'.format(opt.LR))
-    print('| schedule: {}'.format(opt.schedule))
-    print('| warmup  : {}'.format(opt.warmup))
+    print('| dataset  : {}'.format(opt.dataset))
+    print('| netType  : {}'.format(opt.netType))
+    print('| learning : {}'.format(learning))
+    print('| augment  : {}'.format(opt.strongAugment))
+    print('| nEpochs  : {}'.format(opt.nEpochs))
+    print('| LRInit   : {}'.format(opt.LR))
+    print('| schedule : {}'.format(opt.schedule))
+    print('| warmup   : {}'.format(opt.warmup))
+    print('| batchSize: {}'.format(opt.batchSize))
     print('+------------------------------+')

@@ -1,7 +1,7 @@
 """
- Dataset preparation code for ESC-10 and ESC-50 [Piczak 2015].
- Usage: python esc_gen.py [root]
- ffmpeg is required.
+ Dataset preparation code for ESC-10 and ESC-50 [Piczak, 2015].
+ Usage: python esc_gen.py [path]
+ FFmpeg should be installed.
 
 """
 
