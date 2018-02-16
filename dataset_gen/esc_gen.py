@@ -1,5 +1,5 @@
 """
- Dataset preparation code for ESC-10 and ESC-50 [Piczak, 2015].
+ Dataset preparation code for ESC-50 and ESC-10 [Piczak, 2015].
  Usage: python esc_gen.py [path]
  FFmpeg should be installed.
 
@@ -15,79 +15,83 @@ import wavio
 
 
 def main():
-    esc10_path = os.path.join(sys.argv[1], 'esc10')
     esc50_path = os.path.join(sys.argv[1], 'esc50')
-    fs_list = [16000, 44100]
-
-    # Download ESC-10 and ESC-50
-    os.mkdir(esc10_path)
-    subprocess.call('wget -P {} https://github.com/karoldvl/ESC-10/archive/master.zip'.format(
-        esc10_path), shell=True)
-    subprocess.call('unzip -d {} {}'.format(
-        esc10_path, os.path.join(esc10_path, 'master.zip')), shell=True)
-    os.remove(os.path.join(esc10_path, 'master.zip'))
-
+    esc10_path = os.path.join(sys.argv[1], 'esc10')
     os.mkdir(esc50_path)
+    os.mkdir(esc10_path)
+    fs_list = [16000, 44100]  # EnvNet and EnvNet-v2, respectively
+
+    # Download ESC-50
     subprocess.call('wget -P {} https://github.com/karoldvl/ESC-50/archive/master.zip'.format(
         esc50_path), shell=True)
     subprocess.call('unzip -d {} {}'.format(
         esc50_path, os.path.join(esc50_path, 'master.zip')), shell=True)
     os.remove(os.path.join(esc50_path, 'master.zip'))
 
-    # Remove the spaces in the folder names
-    subprocess.call('rename "s/ //g" {}'.format(
-        os.path.join(esc10_path, 'ESC-10-master', '*')), shell=True)
-    subprocess.call('rename "s/ //g" {}'.format(
-        os.path.join(esc50_path, 'ESC-50-master', '*')), shell=True)
-
     # Convert sampling rate
     for fs in fs_list:
-        convert_fs(os.path.join(esc10_path, 'ESC-10-master'),
-                   os.path.join(esc10_path, 'wav{}'.format(fs // 1000)),
-                   fs)
-        convert_fs(os.path.join(esc50_path, 'ESC-50-master'),
-                   os.path.join(esc50_path, 'wav{}'.format(fs // 1000)),
-                   fs)
+        if fs == 44100:
+            continue
+        else:
+            convert_fs(os.path.join(esc50_path, 'ESC-50-master', 'audio'),
+                       os.path.join(esc50_path, 'wav{}'.format(fs // 1000)),
+                       fs)
 
     # Create npz files
     for fs in fs_list:
-        src_path = os.path.join(esc10_path, 'wav{}'.format(fs // 1000))
-        create_dataset(src_path, src_path + '.npz')
-        src_path = os.path.join(esc50_path, 'wav{}'.format(fs // 1000))
-        create_dataset(src_path, src_path + '.npz')
+        if fs == 44100:
+            src_path = os.path.join(esc50_path, 'ESC-50-master', 'audio')
+        else:
+            src_path = os.path.join(esc50_path, 'wav{}'.format(fs // 1000))
+
+        create_dataset(src_path,
+                       os.path.join(esc50_path, 'wav{}.npz'.format(fs // 1000)),
+                       os.path.join(esc10_path, 'wav{}.npz'.format(fs // 1000)))
 
 
 def convert_fs(src_path, dst_path, fs):
     print('* {} -> {}'.format(src_path, dst_path))
     os.mkdir(dst_path)
-    for cls in sorted(os.listdir(src_path)):
-        if os.path.isdir(os.path.join(src_path, cls)):
-            os.mkdir(os.path.join(dst_path, cls))
-            for ogg_file in sorted(glob.glob(os.path.join(src_path, cls, '*.ogg'))):
-                wav_file = ogg_file.replace(src_path, dst_path).replace('.ogg', '.wav')
-                subprocess.call('ffmpeg -i {} -ac 1 -ar {} -loglevel error -y {}'.format(
-                    ogg_file, fs, wav_file), shell=True)
+    for src_file in sorted(glob.glob(os.path.join(src_path, '*.wav'))):
+        dst_file = src_file.replace(src_path, dst_path)
+        subprocess.call('ffmpeg -i {} -ac 1 -ar {} -loglevel error -y {}'.format(
+            src_file, fs, dst_file), shell=True)
 
 
-def create_dataset(src_path, dst_path):
-    print('* {} -> {}'.format(src_path, dst_path))
-    dataset = {}
+def create_dataset(src_path, esc50_dst_path, esc10_dst_path):
+    print('* {} -> {}'.format(src_path, esc50_dst_path))
+    print('* {} -> {}'.format(src_path, esc10_dst_path))
+    esc10_classes = [0, 10, 11, 20, 38, 21, 40, 41, 1, 12]  # ESC-10 is a subset of ESC-50
+    esc50_dataset = {}
+    esc10_dataset = {}
+
     for fold in range(1, 6):
-        dataset['fold{}'.format(fold)] = {}
-        sounds = []
-        labels = []
-        for i, cls in enumerate(sorted(os.listdir(src_path))):
-            for wav_file in sorted(glob.glob(os.path.join(src_path, cls, '{}-*.wav'.format(fold)))):
-                sound = wavio.read(wav_file).data.T[0]
-                start = sound.nonzero()[0].min()
-                end = sound.nonzero()[0].max()
-                sound = sound[start: end + 1]
-                sounds.append(sound)
-                labels.append(i)
-        dataset['fold{}'.format(fold)]['sounds'] = sounds
-        dataset['fold{}'.format(fold)]['labels'] = labels
+        esc50_dataset['fold{}'.format(fold)] = {}
+        esc50_sounds = []
+        esc50_labels = []
+        esc10_dataset['fold{}'.format(fold)] = {}
+        esc10_sounds = []
+        esc10_labels = []
 
-    np.savez(dst_path, **dataset)
+        for wav_file in sorted(glob.glob(os.path.join(src_path, '{}-*.wav'.format(fold)))):
+            sound = wavio.read(wav_file).data.T[0]
+            start = sound.nonzero()[0].min()
+            end = sound.nonzero()[0].max()
+            sound = sound[start: end + 1]  # Remove silent sections
+            label = int(os.path.splitext(wav_file)[0].split('-')[-1])
+            esc50_sounds.append(sound)
+            esc50_labels.append(label)
+            if label in esc10_classes:
+                esc10_sounds.append(sound)
+                esc10_labels.append(esc10_classes.index(label))
+
+        esc50_dataset['fold{}'.format(fold)]['sounds'] = esc50_sounds
+        esc50_dataset['fold{}'.format(fold)]['labels'] = esc50_labels
+        esc10_dataset['fold{}'.format(fold)]['sounds'] = esc10_sounds
+        esc10_dataset['fold{}'.format(fold)]['labels'] = esc10_labels
+
+    np.savez(esc50_dst_path, **esc50_dataset)
+    np.savez(esc10_dst_path, **esc10_dataset)
 
 
 if __name__ == '__main__':
