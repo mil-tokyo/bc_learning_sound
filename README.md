@@ -1,10 +1,13 @@
 BC learning for sounds
 ============================
 
-Implementation of [Learning from Between-class Examples for Deep Sound Recognition](https://arxiv.org/abs/1711.10282) by Yuji Tokozume, Yoshitaka Ushiku, and Tatsuya Harada.
+Implementation of [Learning from Between-class Examples for Deep Sound Recognition](https://arxiv.org/abs/1711.10282) by Yuji Tokozume, Yoshitaka Ushiku, and Tatsuya Harada (ICLR 2018).
 
 This also contains training of EnvNet: [Learning Environmental Sounds with End-to-end Convolutional Neural Network](http://ieeexplore.ieee.org/document/7952651/) (Yuji Tokozume and Tatsuya Harada, ICASSP 2017).<sup>[1](#1)</sup>
 
+## News
+- (2018/02/16) Add support to the latest ESC datasets
+- (2018/01/29) Our paper was accepted by [ICLR 2018](https://openreview.net/forum?id=B1Gi6LeRZ)
 
 ## Contents
 
