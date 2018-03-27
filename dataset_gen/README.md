@@ -18,9 +18,9 @@ Dataset preparation for ESC-50, ESC-10 [[1]](#1), and UrbanSound8K [[2]](#2).
 	- [path]/esc10/wav16.npz
 	- [path]/esc10/wav44.npz
 
-## [UrbanSound8K](https://serv.cusp.nyu.edu/projects/urbansounddataset/urbansound8k.html) setup
+## [UrbanSound8K](http://urbansounddataset.weebly.com/urbansound8k.html) setup
 
-1. Download UrbanSound8K dataset from [this page](https://serv.cusp.nyu.edu/projects/urbansounddataset/urbansound8k.html).
+1. Download UrbanSound8K dataset from [this page](http://urbansounddataset.weebly.com/urbansound8k.html).
 
 2. Move UrbanSound8K directory.
 
